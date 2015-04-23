@@ -1,0 +1,33 @@
+#!/bin/sh
+
+set -e
+
+pxe_server_ip=$(ifconfig $INTERFACE | grep 'inet addr:' | cut -d: -f2 | awk '{print $1}')
+
+echo Server IP: $pxe_server_ip
+
+# Update discovery token, bootstrap with 3 nodes
+# sed -i -e s,DISCOVERY_TOKEN,$(wget -qO- https://discovery.etcd.io/new?size=3),g /pxe/cloud-config.yml
+
+[ -f /coreos/cloud-config.yml ] || cp /pxe/cloud-config.yml /coreos; \
+    echo Use default cloud-config.yml
+[ -f /coreos/cloud-config.sh ] || cp /pxe/cloud-config.sh /coreos; \
+    echo Use default cloud-config.sh
+
+# Update pxelinux config to point real server ip
+sed -i -e s/replace.me/$pxe_server_ip/ /pxe/pxelinux.cfg/default
+
+# Start http server to host cloud.config
+python3 httpd.py /coreos/cloud-config.sh /coreos/cloud-config.yml $pxe_server_ip 80 &
+
+# Start dnsmasq as dhcp proxy to $pxe_server_ip
+dnsmasq \
+    --dhcp-range=$pxe_server_ip,proxy \
+    --dhcp-no-overrid \
+    --dhcp-boot=pxelinux.0,pxeserver,$pxe_server_ip \
+    --pxe-service=x86PC,"Install Linux",pxelinux \
+    --enable-tftp \
+    --tftp-root=/pxe \
+    --user=root \
+    --no-daemon
+

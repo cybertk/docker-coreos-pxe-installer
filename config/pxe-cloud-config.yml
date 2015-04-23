@@ -1,0 +1,23 @@
+#cloud-config
+
+coreos:
+  etcd:
+    # generate a new token for each unique cluster from https://discovery.etcd.io/new?size=3
+    discovery: %(etcd_discovery_token)s
+    addr: %(client_ip)s:4001
+    peer-addr: %(client_ip)s:7001
+  etcd2:
+    # generate a new token for each unique cluster from https://discovery.etcd.io/new?size=3
+    discovery: %(etcd_discovery_token)s
+    initial-advertise-peer-urls: http://%(client_ip)s:2380
+    # listen on both the official ports and the legacy ports
+    # legacy ports can be omitted if your application doesn't depend on them
+    listen-client-urls: http://0.0.0.0:2379
+    listen-peer-urls: http://%(client_ip)s:2380
+  units:
+    - name: etcd.service
+      command: start
+    - name: fleet.service
+      command: start
+ssh_authorized_keys:
+  - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCwfkxdgDdDN1nE+bHguqQRbyOtMp0lJlbZRgPELo91c2gieQ6gJUdVLDLZnN9EzuZuEdzgg3K5dZKGYDkA4RSwRBG+QWFHmjzv709fZSx10Myh/E6ZPWFqKPS07L5eAJ1c8GZFHG3ScKam9i8aFmq/hnOImb56OX1kqMK8rn+7kzKbwbl7maOHqd80bCZWSdQzRx9rVFMAxRjfjltgOAxoKrND9cgSMmEXkZvDXJsx2/OHKezJhikq3RRD2yK4rqiTiHA4c/FqPwefpJC3gtWDOhR6NL/P7ahRBvyUKWetJaCgvjMMSTVX6dehGq+NwWmJtXB1GqmA4cnuMI9VIw33

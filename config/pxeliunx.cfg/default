@@ -1,0 +1,11 @@
+default coreos
+prompt 1
+timeout 15
+
+display boot.msg
+
+label coreos
+  menu default
+  kernel coreos_production_pxe.vmlinuz
+  # See https://coreos.com/docs/running-coreos/bare-metal/booting-with-pxe/
+  append initrd=coreos_production_pxe_image.cpio.gz cloud-config-url=http://replace.me/cloud-config.sh rootfstype=btrfs coreos.autologin
