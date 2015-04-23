@@ -9,25 +9,27 @@ echo Server IP: $pxe_server_ip
 # Update discovery token, bootstrap with 3 nodes
 # sed -i -e s,DISCOVERY_TOKEN,$(wget -qO- https://discovery.etcd.io/new?size=3),g /pxe/cloud-config.yml
 
-[ -f /coreos/cloud-config.yml ] || cp /pxe/cloud-config.yml /coreos; \
-    echo Use default cloud-config.yml
-[ -f /coreos/cloud-config.sh ] || cp /pxe/cloud-config.sh /coreos; \
-    echo Use default cloud-config.sh
+
+[ -d /config ] || cp -R /app/config /config; echo Use default cloud-config.yml
+
+# Copy to tftp root
+cp -R /config/pxelinux.cfg /app/tftp
+chmod a+r /app/tftp/pxelinux.cfg/*
 
 # Update pxelinux config to point real server ip
-sed -i -e s/replace.me/$pxe_server_ip/ /pxe/pxelinux.cfg/default
+sed -i -e s/%\(server_ip\)s/$pxe_server_ip/ /app/tftp/pxelinux.cfg/*
 
 # Start http server to host cloud.config
-python3 httpd.py /coreos/cloud-config.sh /coreos/cloud-config.yml $pxe_server_ip 80 &
+python3 /app/httpd.py /config/cloud-config-bootstrap.sh config/cloud-config.yml $pxe_server_ip 80 &
 
 # Start dnsmasq as dhcp proxy to $pxe_server_ip
 dnsmasq \
     --dhcp-range=$pxe_server_ip,proxy \
     --dhcp-no-overrid \
     --dhcp-boot=pxelinux.0,pxeserver,$pxe_server_ip \
-    --pxe-service=x86PC,"Install Linux",pxelinux \
+    --pxe-service=x86PC,"Install CoreOS",pxelinux \
     --enable-tftp \
-    --tftp-root=/pxe \
+    --tftp-root=/app/tftp \
     --user=root \
     --no-daemon
 
