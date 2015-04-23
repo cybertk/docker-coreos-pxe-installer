@@ -18,10 +18,11 @@ RUN cp /usr/lib/syslinux/pxelinux.0 /installer/
 
 # Install coreos pxe images
 RUN cd /installer && \
-    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz && \
-    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz.sig && \
-    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz && \
-    wget http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz.sig && \
+    wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz && \
+    wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz.sig && \
+    wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz && \
+    wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz.sig && \
+    wget -qO- https://coreos.com/security/image-signing-key/CoreOS_Image_Signing_Key.pem | gpg --import && \
     gpg --verify coreos_production_pxe.vmlinuz.sig && \
     gpg --verify coreos_production_pxe_image.cpio.gz.sig
 
