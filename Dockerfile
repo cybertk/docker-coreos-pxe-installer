@@ -8,32 +8,30 @@ echo "deb http://mirrors.aliyun.com/ubuntu/ trusty-updates main restricted unive
 echo "deb http://mirrors.aliyun.com/ubuntu/ trusty-proposed main restricted universe multiverse" >> /etc/apt/sources.list && \
 echo "deb http://mirrors.aliyun.com/ubuntu/ trusty-backports main restricted universe multiverse" >> /etc/apt/sources.list
 
+# Install deps
 RUN apt-get update && apt-get install -y dnsmasq syslinux wget
 
-ADD config /config/
-ADD app /installer/
+COPY app /app
 
 # Install pxelinux.0
-RUN cp /usr/lib/syslinux/pxelinux.0 /installer/
+RUN cp /usr/lib/syslinux/pxelinux.0 /app/
 
 # Install coreos pxe images
-RUN cd /installer && \
+RUN cd /app && \
     wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz && \
-    wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz.sig && \
-    wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz && \
-    wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz.sig && \
-    wget -qO- https://coreos.com/security/image-signing-key/CoreOS_Image_Signing_Key.pem | gpg --import && \
-    gpg --verify coreos_production_pxe.vmlinuz.sig && \
-    gpg --verify coreos_production_pxe_image.cpio.gz.sig
+    wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz
 
-# ADD http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz /pxe/
+#     wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe.vmlinuz.sig && \
+#     wget -q http://stable.release.core-os.net/amd64-usr/current/coreos_production_pxe_image.cpio.gz.sig && \
+#     wget -qO- https://coreos.com/security/image-signing-key/CoreOS_Image_Signing_Key.pem | gpg --import && \
+#     gpg --verify coreos_production_pxe.vmlinuz.sig && \
+#     gpg --verify coreos_production_pxe_image.cpio.gz.sig
+
 
 # RUN chmod 644 pxe/pxelinux.cfg/default && \
 #     chmod 644 pxe/pxelinux.0 && \
 #     chmod 644 pxe/coreos_production_pxe_image.cpio.gz && \
 #     chmod 644 pxe/coreos_production_pxe.vmlinuz
-
-WORKDIR /config
 
 # Customizations
 ENV INTERFACE=eth1
