@@ -8,6 +8,6 @@ set -e
 until curl -O http://%(server_ip)s/cloud-config.yml; do sleep 2; done
 
 # Install coreos
-sudo coreos-install -d /dev/sda -c cloud-config.yml
+until sudo coreos-install -d /dev/sda -c cloud-config.yml; do sleep 2; done
 
 sudo reboot
