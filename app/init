@@ -33,7 +33,7 @@ fi
 
 # Host images
 cd /config/images
-python3 -m http.server $pxe_server_ip 3000 &
+python3 -m http.server 3000 &
 
 # Start dnsmasq as dhcp proxy to $pxe_server_ip
 dnsmasq \
