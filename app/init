@@ -9,8 +9,8 @@ echo Server IP: $pxe_server_ip
 # Update discovery token, bootstrap with 3 nodes
 # sed -i -e s,DISCOVERY_TOKEN,$(wget -qO- https://discovery.etcd.io/new?size=3),g /pxe/cloud-config.yml
 
-
-[ -d /config/pxelinux.cfg ] || \
+# Fallback to default config if user dose not provide
+[ ! -d /config/pxelinux.cfg ] && \
     echo "Use default configs" && cp -a /app/config/. /config
 
 # Copy to tftp root
@@ -25,6 +25,7 @@ python3 /app/httpd.py /config $pxe_server_ip 80 &
 
 # Download image
 if [ ! -d /config/images ];then
+    echo "Downloading CoreOS images"
     mkdir -p /config/images/633.1.0
     wget http://stable.release.core-os.net/amd64-usr/633.1.0/coreos_production_image.bin.bz2
     wget http://stable.release.core-os.net/amd64-usr/633.1.0/coreos_production_image.bin.bz2.sig
@@ -32,7 +33,7 @@ fi
 
 # Host images
 cd /config/images
-python3 -m http.server 3000 &
+python3 -m http.server $pxe_server_ip 3000 &
 
 # Start dnsmasq as dhcp proxy to $pxe_server_ip
 dnsmasq \
