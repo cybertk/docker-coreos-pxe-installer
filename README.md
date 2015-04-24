@@ -30,6 +30,10 @@ There are some template variables you can use in the configurations, **coreos-px
 - `client_ip`, current client ipv4 address
 - `etcd_discovery_token`, etcd Discovery Token
 
+### Adding a Custom OEM
+
+To add cloud config in initramfs, see https://coreos.com/docs/running-coreos/bare-metal/booting-with-pxe/
+
 ## Install on disk
 
 ## Test
