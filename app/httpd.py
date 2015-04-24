@@ -43,6 +43,7 @@ class PxeHandler(http.server.SimpleHTTPRequestHandler):
         options = {
                 "server_ip": server_ip,
                 "client_ip": self.client_address[0],
+                "client_ip_dash": self.client_address[0].replace(".", "-"),
                 "etcd_discovery_token": etcd_discovery_token,
         }
         self.wfile.write(bytes(template % options, "utf-8"))

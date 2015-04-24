@@ -28,6 +28,7 @@ There are some template variables you can use in the configurations, **coreos-px
 
 - `server_ip`, current server ipv4 address
 - `client_ip`, current client ipv4 address
+- `client_ip_dash`, replace `.` to `-` of `client_ip`
 - `etcd_discovery_token`, etcd Discovery Token
 
 ### Adding a Custom OEM
