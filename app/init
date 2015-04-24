@@ -21,7 +21,7 @@ chmod a+r /app/tftp/pxelinux.cfg/*
 sed -i -e s/%\(server_ip\)s/$pxe_server_ip/ /app/tftp/pxelinux.cfg/*
 
 # Start http server to host cloud.config
-python3 /app/httpd.py /config $pxe_server_ip 80 &
+python3 -u /app/httpd.py /config $pxe_server_ip 80 &
 
 # Download image
 if [ ! -d /config/images ];then
@@ -33,7 +33,7 @@ fi
 
 # Host images
 cd /config/images
-python3 -m http.server 3000 &
+python3 -u -m http.server 3000 &
 
 # Start dnsmasq as dhcp proxy to $pxe_server_ip
 dnsmasq \
